@@ -2,10 +2,39 @@
 
 #define NUM_MENU_SECTIONS 2
 #define NUM_MENU_ICONS 3
-#define NUM_FIRST_MENU_ITEMS 3
-#define NUM_SECOND_MENU_ITEMS 1
+#define NUM_FIRST_MENU_ITEMS 1
+#define NUM_SECOND_MENU_ITEMS 5
 
 static Window *window;
+
+char *routes[]={"Commuter Southbound",
+ "Commuter Northbound",
+ "Northwood",
+"Bursley-Baits",
+"Bursley-Baits (Nights)",
+"Intercampus to East Campus"
+"Intercampus to NIB",
+"Mitchell-Glazier to Glazier and VA",
+"KMS Shuttle",
+"Oxford Shuttle",
+"Diag to Diag express"
+"Commuter Northbound (Nights)"
+"Oxford Loop to Diag to Diag Express",
+"North Campus",
+"Night Owl",
+"Bursley-Baits",
+"Northwood",
+"Oxford Shuttle"};
+
+char *values[]={"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+"13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27",
+"28", "29", "30"};
+
+static int counter = 0;
+static int *arrivalTimes;
+static int *buses;
+static char *title;
+
 
 // This is a menu layer
 // You have more control than with a simple menu layer
@@ -18,6 +47,116 @@ static int current_icon = 0;
 
 // You can draw arbitrary things in a menu item such as a background
 static GBitmap *menu_background;
+
+
+//////////////////////////////////////////
+void out_sent_handler(DictionaryIterator *sent, void *context) {
+   // outgoing message was delivered
+ }
+
+
+ void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, void *context) {
+   // outgoing message failed
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "REASON: %i", reason);
+ }
+
+ void in_received_handler(DictionaryIterator *iter, void *context) {
+
+      Tuple *text_tuple; 
+      Tuple *tuple;
+      Tuple *tuple2;
+      Tuple *tuple3;
+      int size = 0;
+      int i = 0;
+      switch(counter){
+
+        case(0):
+          text_tuple = dict_find(iter, 0);
+            if(text_tuple){
+
+              title = malloc(text_tuple->length);
+              strncpy(title, text_tuple->value->cstring, text_tuple->length);
+              APP_LOG(APP_LOG_LEVEL_DEBUG, "Title: %s", title);
+            }
+
+        break;
+        case(1):
+
+            tuple = dict_find(iter, 0);
+            if(tuple){
+
+              size = tuple->value->int32;
+              APP_LOG(APP_LOG_LEVEL_DEBUG, "Route Size is %i", size);
+            }
+            
+
+        break;
+        case(2):
+
+            tuple2 = dict_find(iter, 0);
+            while (tuple2) {
+
+               arrivalTimes[i] = tuple2->value->int32;
+
+               tuple2 = dict_read_next(iter);
+               i ++;
+            }
+
+            for(i = 0; i < 5; i ++){
+
+                APP_LOG(APP_LOG_LEVEL_DEBUG, "%i is %i", i, arrivalTimes[i]);
+
+            }
+
+        break;
+        case(3):
+
+            tuple3 = dict_find(iter, 0);
+            while (tuple3) {
+
+               buses[i] = tuple3->value->int32;
+               tuple3 = dict_read_next(iter);
+               i ++;
+            }
+
+            for(i = 0; i < 5; i ++){
+
+                APP_LOG(APP_LOG_LEVEL_DEBUG, "%i is %i", i, buses[i]);
+                if(buses[i] >= 0 && buses[i] < 19){
+
+
+                    
+                }
+
+            }
+
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "Title is %s", title);
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "Title is %s", title);   
+        for(int i = 0; i < 5; i ++){
+
+              APP_LOG(APP_LOG_LEVEL_DEBUG, "Bus is %s", routes[buses[i]]); 
+          
+        }       
+
+        break;
+        default:
+
+            APP_LOG(APP_LOG_LEVEL_DEBUG, "Default");
+        break;
+
+      };
+
+      counter ++;
+
+ }
+
+
+ void in_dropped_handler(AppMessageResult reason, void *context) {
+   // incoming message dropped
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "REASON: %i", reason);
+ }
+///////////////////////////////////////////////////////
+
 
 // A callback is used to specify the amount of sections of menu items
 // With this, you can dynamically add and remove sections
@@ -52,11 +191,11 @@ static void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, ui
   switch (section_index) {
     case 0:
       // Draw title text in the section header
-      menu_cell_basic_header_draw(ctx, cell_layer, "Some example items");
+      menu_cell_basic_header_draw(ctx, cell_layer, "Closest Bus Stop");
       break;
 
     case 1:
-      menu_cell_basic_header_draw(ctx, cell_layer, "One more");
+      menu_cell_basic_header_draw(ctx, cell_layer, "Bus Locations");
       break;
   }
 }
@@ -70,19 +209,10 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
       switch (cell_index->row) {
         case 0:
           // This is a basic menu item with a title and subtitle
-          menu_cell_basic_draw(ctx, cell_layer, "Basic Item", "With a subtitle", NULL);
-          break;
-
-        case 1:
-          // This is a basic menu icon with a cycling icon
-          menu_cell_basic_draw(ctx, cell_layer, "Icon Item", "Select to cycle", menu_icons[current_icon]);
-          break;
-
-        case 2:
-          // Here we use the graphics context to draw something different
-          // In this case, we show a strip of a watchface's background
-          graphics_draw_bitmap_in_rect(ctx, menu_background,
-              (GRect){ .origin = GPointZero, .size = layer_get_frame((Layer*) cell_layer).size });
+          if(!title)
+            menu_cell_basic_draw(ctx, cell_layer, "Bus Stop Name", NULL, NULL);
+          else
+              menu_cell_basic_draw(ctx, cell_layer, title, NULL, NULL);
           break;
       }
       break;
@@ -90,8 +220,43 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
     case 1:
       switch (cell_index->row) {
         case 0:
-          // There is title draw for something more simple than a basic menu item
-          menu_cell_title_draw(ctx, cell_layer, "Final Item");
+          // This is a basic menu item with a title and subtitle
+          if(!buses[0])
+            menu_cell_basic_draw(ctx, cell_layer, "", NULL, NULL);
+          else
+            menu_cell_basic_draw(ctx, cell_layer, routes[buses[0]], values[arrivalTimes[0]], NULL);
+          break;
+        case 1:
+          // This is a basic menu item with a title and subtitle
+          if(!buses[1])
+            menu_cell_basic_draw(ctx, cell_layer, "", NULL, NULL);
+          else 
+            menu_cell_basic_draw(ctx, cell_layer, routes[buses[1]], values[arrivalTimes[1]], NULL);
+          break;
+
+        case 2:
+          // This is a basic menu item with a title and subtitle
+          if(!buses[2])
+            menu_cell_basic_draw(ctx, cell_layer, "", NULL, NULL);
+          else
+            menu_cell_basic_draw(ctx, cell_layer, routes[buses[2]], values[arrivalTimes[2]], NULL);
+
+          break;
+
+        case 3:
+          // This is a basic menu item with a title and subtitle
+          if(!buses[3])
+            menu_cell_basic_draw(ctx, cell_layer, "", NULL, NULL);
+          else
+            menu_cell_basic_draw(ctx, cell_layer, routes[buses[3]], values[arrivalTimes[3]], NULL);
+          break;
+
+        case 4:
+          // This is a basic menu item with a title and subtitle
+          if(!buses[4])
+            menu_cell_basic_draw(ctx, cell_layer, "", NULL, NULL);
+          else
+            menu_cell_basic_draw(ctx, cell_layer, routes[buses[4]], values[arrivalTimes[4]], NULL);
           break;
       }
   }
@@ -165,6 +330,19 @@ void window_unload(Window *window) {
 
 int main(void) {
   window = window_create();
+
+   arrivalTimes = (int *)malloc(sizeof(int)*5);
+  buses = (int *)malloc(sizeof(int)*5);
+
+  //set up messages
+   app_message_register_inbox_received(in_received_handler);
+   app_message_register_inbox_dropped(in_dropped_handler);
+   app_message_register_outbox_sent(out_sent_handler);
+   app_message_register_outbox_failed(out_failed_handler);
+
+    const uint32_t inbound_size = 64;
+   const uint32_t outbound_size = 64;
+   app_message_open(inbound_size, outbound_size);
 
   // Setup the window handlers
   window_set_window_handlers(window, (WindowHandlers) {

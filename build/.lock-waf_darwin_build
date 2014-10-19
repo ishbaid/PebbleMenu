@@ -1,0 +1,8 @@
+argv = ['/Users/Ish/pebble-dev/PebbleSDK-2.7/Pebble/waf', 'configure', 'build']
+environ = {'TERM_SESSION_ID': 'C1DC03D5-B46B-4809-973D-E5A1F770189E', 'PYTHONPATH': '/Users/Ish/pebble-dev/PebbleSDK-2.7/bin/../.env/lib/python2.7/site-packages', 'SSH_AUTH_SOCK': '/tmp/launch-vNKlt6/Listeners', 'TERM_PROGRAM_VERSION': '326', 'SHELL': '/bin/bash', 'LOGNAME': 'Ish', 'USER': 'Ish', 'HOME': '/Users/Ish', 'PATH': '/Users/Ish/pebble-dev/PebbleSDK-2.7/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/Users/Ish/pebble-dev/PebbleSDK-2.7/arm-cs-tools/bin', 'TMPDIR': '/var/folders/fk/t8vvjchx5wq4x1k04klyfyy40000gn/T/', 'TERM_PROGRAM': 'Apple_Terminal', 'LANG': 'en_US.UTF-8', 'TERM': 'xterm-256color', 'Apple_PubSub_Socket_Render': '/tmp/launch-0Y3uLB/Render', 'SHLVL': '2', '__CF_USER_TEXT_ENCODING': '0x1F5:0:0', 'PWD': '/Users/Ish/Documents/Programming/Pebble Development/PebbleMenu', '_': '/Users/Ish/pebble-dev/PebbleSDK-2.7/Pebble/waf', '__CHECKFIX1436934': '1'}
+files = ['/Users/Ish/Documents/Programming/Pebble Development/PebbleMenu/wscript']
+hash = 921297623
+options = {'files': '', 'jobs': 4, 'verbose': 0, 'nocache': False, 'progress_bar': 0, 'timestamp': None, 'distcheck_args': None, 'top': '', 'destdir': '', 'keep': 0, 'zones': '', 'debug': False, 'prefix': '/usr/local/', 'download': False, 'force': False, 'targets': '', 'out': ''}
+out_dir = '/Users/Ish/Documents/Programming/Pebble Development/PebbleMenu/build'
+run_dir = '/Users/Ish/Documents/Programming/Pebble Development/PebbleMenu'
+top_dir = '/Users/Ish/Documents/Programming/Pebble Development/PebbleMenu'
